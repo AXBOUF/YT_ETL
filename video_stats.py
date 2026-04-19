@@ -6,7 +6,7 @@ from pprint import pprint
 from datetime import datetime as date
 
 load_dotenv()
-channel_handle = "bbacalhau"
+channel_handle = "manyatabaraili"
 API_KEY = os.getenv('API_KEY')
 def summarize_json(data):
     # i  want to see the general structure of the json response and the keys that are present in it

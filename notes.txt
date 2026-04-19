@@ -1,1 +1,14 @@
 UCGs1JjiRBEKMlVD4eUxJ2ww
+
+airflow dir structure
+
+data
+dags
+logs
+configs
+plugins
+include 
+
+
+
+----
