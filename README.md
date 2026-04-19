@@ -25,3 +25,8 @@ docker exec -it containernames bash ( takes you inside the conatiner )
 to check if the data are in both env just go in one and check in there 
 
 docker compose up -d --build ( to update with out stopping the )
+
+
+# NOTE 
+
+YOU MISSED THE REQUIREMENTS.TXT CONTENT THAT CAUSED HASSLE TO CREATE

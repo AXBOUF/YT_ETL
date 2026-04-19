@@ -1,2 +1,4 @@
 psycopg2-binary
 apache-airflow-providers-postgres
+apache-airflow-providers-celery
+redis

@@ -1,13 +1,17 @@
 import requests 
-import os 
-from dotenv import load_dotenv
+# import os 
+# from dotenv import load_dotenv
 import json 
 from pprint import pprint
 from datetime import datetime as date
 
-load_dotenv()
-channel_handle = "manyatabaraili"
-API_KEY = os.getenv('API_KEY')
+from airflow.decorators import task
+from airflow.models import Variable
+
+# load_dotenv()
+channel_handle = Variable.get("CHANNEL_HANDLE")
+API_KEY = Variable.get("API_KEY")
+maxResults = 50 
 def summarize_json(data):
     # i  want to see the general structure of the json response and the keys that are present in it
     summary = {
@@ -162,7 +166,7 @@ def extract_video_data(video_ids):
     }
     '''
     extracted_data = []
-    maxResults = 50 # this is the maximum number of video ids that we can send in one API call to the videos endpoint
+ # this is the maximum number of video ids that we can send in one API call to the videos endpoint
     def batch_video_ids(video_ids, batch_size=50):
         for i in range(0, len(video_ids), batch_size):
             yield video_ids[i:i + batch_size]
