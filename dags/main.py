@@ -3,10 +3,11 @@ import pendulum
 from datetime import datetime, timedelta
 from api.video_stats import get_channel_playlist_id, get_video_ids, save_to_json, extract_video_data
 from datawarehouse.dwh import staging_table, core_table
+from data_quality.soda import run_soda_checks
 # local timezone 
 local_tz = pendulum.timezone("Australia/Sydney") 
 
-# default args 
+# default args d
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -20,6 +21,8 @@ default_args = {
     'start_date': datetime(2024, 6, 1, tzinfo=local_tz),
     # 'end_date': datetime(2024, 6, 30, tzinfo=local_tz),
 }
+staging_schema = 'staging'
+core_schema = 'core'
 
 with DAG(
     dag_id='produce_json',
@@ -65,3 +68,19 @@ with DAG(
 
 # the core table is same but with transform_data function applied to the staging data before loading it into the core table, and also we will have an additional column in the core table 
 # which is video type (short or normal) based on the duration of the video.
+
+with DAG(
+    dag_id='soda_check',
+    default_args=default_args,
+    description='A DAG to check data quality in databse in both lkayers using soda',
+    schedule='0 16 * * *', # this means that the DAG will run every day at 3 PM Sydney time refer to https://crontab.guru/#0_14_*_*_*
+    catchup=False
+) as dag:
+
+    # define tasks 
+    stage_task = run_soda_checks(schema=staging_schema)
+    core_task = run_soda_checks(schema=core_schema)
+    
+
+    # define dependencies
+    stage_task >> core_task
