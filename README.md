@@ -75,3 +75,39 @@ So the pattern was not one single issue. It was a chain of mismatches:
 * JSON key casing was wrong in [data_modification.py](vscode-file://vscode-app/usr/lib/code/out/vs/code/electron-browser/workbench/workbench.html)
 
 The current code has been adjusted for those issues, so the next DAG run should get past the exact failures shown in the logs.
+
+
+## Some PSQL Common Commands
+
+Connect to a database:
+psql -h localhost -p 5433 -U postgres -d elt_db
+
+List databases:
+\l
+
+List schemas:
+\dn
+
+List tables:
+\dt
+\dt staging.*
+\dt core.*
+
+Describe a table:
+\d staging.yt_api
+\d core.yt_api
+
+Show current connection info:
+\conninfo
+
+Run a SQL query:
+SELECT * FROM staging.yt_api LIMIT 5;
+
+Switch database inside psql:
+\c elt_db
+
+Show table data in expanded view:
+\x
+
+Quit psql:
+\q

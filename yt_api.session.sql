@@ -1,0 +1,2 @@
+SELECT * FROM staging.yt_api;
+SHOW DATABASES;
