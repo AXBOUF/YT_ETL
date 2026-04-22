@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 table = 'yt_api'
 
-def insert_rows(cur, conn, schema, rows):
+def insert_rows(cur, conn, schema, row):
     try:
         if schema == 'staging':
             video_id = 'video_id'
@@ -21,50 +21,55 @@ def insert_rows(cur, conn, schema, rows):
             cur.execute(f"""
                 INSERT INTO {schema}.{table}
                 ("Video_id", "Video_title", "Upload_date", "Duration", "Video_Type", "View_Count", "Like_Count", "Comment_Count")
-                VALUES (%(Video_id)s, %(Video_title)s, %(Upload_date)s, %(Duration)s, %(Video_Type)s, %(View_Count)s, %(Like_Count)s, %(Comment_Count)s
+                VALUES (%(Video_id)s, %(Video_title)s, %(Upload_date)s, %(Duration)s, %(Video_Type)s, %(View_Count)s, %(Like_Count)s, %(Comment_Count)s)
             """, row # WHY IS ROW HERE? BECAUSE WE ARE PASSING THE VALUES THAT WE WANT TO INSERT INTO THE TABLE, AND ROW IS A DICTIONARY THAT CONTAINS THE ACTUAL VALUES THAT WE WANT TO INSERT.
             ) # HERE THE VALUES ARE MAPPING THE STAGING TABLES 
         conn.commit()
         logger.info(f"Inserted row with video_id: {row[video_id]}")
 
     except Exception as e:
-        logger.error(f"Error loading the row with video_id: {row[video_id]} ")
+        logger.error(f"Error loading the row with video_id: {row.get(video_id, 'unknown')} ")
         raise e
 
-def update_rows(cur, conn, schema, rows):
+def update_rows(cur, conn, schema, row):
     try:
         # staging
         if schema == 'staging': # LEFT IS STAGING COLUMN NAMES AND RIGHT IS JSON KEY NAMES
-            Video_id = 'video_id'
-            Upload_date = 'publishedAt'
-            Video_title = 'title'
-            View_Count = 'viewCount'
-            Like_Count = 'likeCount'
-            Comment_Count = 'commentCount'
+            params = {
+                'Video_id': row['video_id'],
+                'Video_title': row['title'],
+                'Upload_date': row['publishedAt'],
+                'Duration': row['duration'],
+                'View_Count': row['viewCount'],
+                'Like_Count': row['likeCount'],
+                'Comment_Count': row['commentCount'],
+            }
         else:
             #core # LEFT IS CORE COLUMN NAMES AND RIGHT IS STAGING COLUMN NAMES
-            Video_id = 'Video_id'
-            Video_title = 'Video_title'
-            Upload_date = 'Upload_date'
-            Duration = 'Duration'
-            Video_Type = 'Video_Type'
-            View_Count = 'View_Count'
-            Like_Count = 'Like_Count'
-            Comment_Count = 'Comment_Count'
+            params = {
+                'Video_id': row['Video_id'],
+                'Video_title': row['Video_title'],
+                'Upload_date': row['Upload_date'],
+                'Duration': row['Duration'],
+                'Video_Type': row.get('Video_Type'),
+                'View_Count': row['View_Count'],
+                'Like_Count': row['Like_Count'],
+                'Comment_Count': row['Comment_Count'],
+            }
         cur.execute(
             f"""
             UPDATE {schema}.{table}
-            SET "Video_Title" = %(Video_title)s,
-                "Likes_Count" = %(Like_Count)s,
+            SET "Video_title" = %(Video_title)s,
+                "Like_Count" = %(Like_Count)s,
                 "View_Count" = %(View_Count)s,
                 "Comment_Count" = %(Comment_Count)s
             WHERE "Video_id" = %(Video_id)s AND "Upload_date" = %(Upload_date)s
-            """, row # row is for the values that we want to update in the table, and row is a dictionary that contains the actual values that we want to update.
+            """, params # row is for the values that we want to update in the table, and row is a dictionary that contains the actual values that we want to update.
         )
         conn.commit()
-        logger.info(f"Updated row with video_id: {row[Video_id]}")
+        logger.info(f"Updated row with video_id: {params['Video_id']}")
     except Exception as e:
-        logger.error(f"Error updating the row with video_id: {row[Video_id]} ")
+        logger.error(f"Error updating the row with video_id: {params['Video_id']} ")
         raise e
 
 def delete_rows(cur, conn, schema, video_id):

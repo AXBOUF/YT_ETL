@@ -1,13 +1,13 @@
 # we will have scripts for schema creation
 from airflow.providers.postgres.hooks.postgres import PostgresHook 
 
-from pycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor
 
 table = "yt_api"
 def get_conn_cursor():
     hook = PostgresHook(postgres_conn_id="postgres_db_yt_elt", database="elt_db") # establish connection to the database using Airflow's PostgresHook ( id are in docker-compose.yaml)
     conn = hook.get_conn()
-    cur = conn.cursor(cursfor_factory=RealDictCursor) # create a cursor with RealDictCursor to get results as dictionaries
+    cur = conn.cursor(cursor_factory=RealDictCursor) # create a cursor with RealDictCursor to get results as dictionaries
     return conn, cur
 
 def close_conn_cursor(conn, cur):    
@@ -64,8 +64,8 @@ def create_table(schema):
     conn.commit()
     close_conn_cursor(conn, cur)
 
-def get_all_video_ids(schema): 
-    cur.execute(f"SELECT Video_id FROM {schema}.{table};")
+def get_all_video_ids(cur, schema): 
+    cur.execute(f'SELECT "Video_id" FROM {schema}.{table};')
     ids = cur.fetchall()
     video_ids = [row['Video_id'] for row in ids]
     return video_ids

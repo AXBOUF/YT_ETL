@@ -1,14 +1,22 @@
 import json 
 from datetime import date
+from pathlib import Path
+from glob import glob
 import logging
 
 logger = logging.getLogger(__name__) # activate logging
 
 def load_path(): # loading json to variable 
-    file_path = f"./data/YT_data_{date.today()}.json"
+    data_dir = Path(__file__).resolve().parents[2] / "data"
+    file_path = data_dir / f"YT_data_{date.today().isoformat()}.json"
+
+    if not file_path.exists():
+        matches = sorted(glob(str(data_dir / f"YT_data_{date.today().isoformat()}*.json")))
+        if matches:
+            file_path = Path(matches[-1])
 
     try:
-        logger.info(f"Processing file: YT_data_{date.today()}")
+        logger.info(f"Processing file: {file_path.name}")
 
         with open(file_path, 'r', encoding='utf-8') as raw_data:
             data = json.load(raw_data)

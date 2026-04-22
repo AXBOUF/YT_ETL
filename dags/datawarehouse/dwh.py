@@ -10,9 +10,10 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__) # activate logging
 table = 'yt_api'
 
+@task
 def staging_table():
     schema = 'staging'
-    conn,cur = NONE, NONE
+    conn, cur = None, None
     try:
         conn, cur = get_conn_cursor()
         YT_data = load_path()
@@ -33,7 +34,7 @@ def staging_table():
         ids_to_del = set(table_ids) - set(ids_in_json) # this will give us the set of video ids that are present in the table but not present in the json file.
 
         if ids_to_del:
-            delete_rows(cur, conn, schema, ids_to_delete)
+            delete_rows(cur, conn, schema, ids_to_del)
 
         logger.info(f"{schema} table updated successfully with data from json file.")
     except Exception as e:
@@ -47,14 +48,14 @@ def staging_table():
 def core_table():
     schema = 'core'
     # we are using transform function in core table because we want to transform the data from the staging table before we load it into the core table, and the transformation logic is defined in the transform_data function in the data_transformation.py file. 
-    conn, cur = NONE, NONE
+    conn, cur = None, None
     try:
         conn, cur = get_conn_cursor()
         create_schema(schema)
         create_table(schema)
         
         table_ids = get_all_video_ids(cur, schema)
-        currrent_video_ids = set() # SMALL COMMENT: this is to keep track of the video ids that we have already processed in the staging table, so that we can avoid processing the same video id multiple times and also to avoid inserting duplicate rows into the core table.
+        current_video_ids = set() # SMALL COMMENT: this is to keep track of the video ids that we have already processed in the staging table, so that we can avoid processing the same video id multiple times and also to avoid inserting duplicate rows into the core table.
         cur.execute(f"SELECT * FROM staging.{table};")
         rows = cur.fetchall() # if there are millions of rows then try batching it 
         '''
@@ -77,7 +78,7 @@ def core_table():
             else:
                 transformed_row = transform_data(row)
 
-                if transfomed_row['Video_id'] in table_ids: # if the video id is already in the core table
+                if transformed_row['Video_id'] in table_ids: # if the video id is already in the core table
                     update_rows(cur, conn, schema, transformed_row) # then we will update the row in the core table with the new values from the staging table.
                 else:
                     # if the video id is present but new 

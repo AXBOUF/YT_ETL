@@ -3,7 +3,8 @@ import requests
 # from dotenv import load_dotenv
 import json 
 from pprint import pprint
-from datetime import datetime as date
+from datetime import date
+from pathlib import Path
 
 from airflow.decorators import task
 from airflow.models import Variable
@@ -12,6 +13,7 @@ from airflow.models import Variable
 channel_handle = Variable.get("CHANNEL_HANDLE")
 API_KEY = Variable.get("API_KEY")
 maxResults = 50 
+@task
 def summarize_json(data):
     # i  want to see the general structure of the json response and the keys that are present in it
     summary = {
@@ -22,6 +24,7 @@ def summarize_json(data):
         "items_keys": [item.keys() for item in data.get("items", [])]
     }
     return summary
+@task
 def get_channel_playlist_id():
     try:
         url = f"https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={channel_handle}&key={API_KEY}"
@@ -37,8 +40,10 @@ def get_channel_playlist_id():
         return channel_playlist_id
     except requests.exceptions.RequestException as e:
         return e
+@task
 def count(anything): # why because i can 
     return len(anything)
+@task
 def get_video_ids(playlist_id):
     '''
         { # this is the general structure of the json response that we get from the youtube api when we call the playlistItems endpoint thanks to pprint 
@@ -90,6 +95,7 @@ def get_video_ids(playlist_id):
 
 "https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails&part=snippet&part=statistics&id=EIbLMyG4mkY&key=[YOUR_API_KEY]"
 
+@task
 def extract_video_data(video_ids):
     '''
     {
@@ -199,8 +205,10 @@ def extract_video_data(video_ids):
 
     except requests.exceptions.RequestException as e:
         return e
+@task
+
 def save_to_json(extracted_data):
-    file_path = f"./data/YT_data_{date.today()}.json"
+    file_path = Path(__file__).resolve().parents[2] / "data" / f"YT_data_{date.today().isoformat()}.json"
     with open(file_path, "w", encoding="utf-8") as json_spitfile:
         json.dump(extracted_data, json_spitfile, indent=4, ensure_ascii=False)
 if __name__ == "__main__":
