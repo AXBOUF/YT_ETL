@@ -6,11 +6,11 @@ Plan your project start to end in rough vision.
 
 PLAYLIST ID , VIDEO ID
 
-NOTE 
+NOTE
 
-requirement -- for .py scripts 
+requirement -- for .py scripts
 
-requirements.txt for airflow sth like that 
+requirements.txt for airflow sth like that
 
 ## DOCKER COMMANDS
 
@@ -22,11 +22,18 @@ docker ps -a ( will show all )
 
 docker exec -it containernames bash ( takes you inside the conatiner )
 
-to check if the data are in both env just go in one and check in there 
+to check if the data are in both env just go in one and check in there
 
 docker compose up -d --build ( to update with out stopping the )
 
-
-# NOTE 
+# NOTE
 
 YOU MISSED THE REQUIREMENTS.TXT CONTENT THAT CAUSED HASSLE TO CREATE
+
+for the airflow we use hooks 
+
+
+connection allows connection with warehouse and cursor allows fucntions
+
+
+helper functions are small fun that assists
