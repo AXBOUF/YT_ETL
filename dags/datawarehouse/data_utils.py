@@ -40,7 +40,7 @@ def create_table(schema):
         CREATE TABLE IF NOT EXISTS {schema}.{table} (
             "Video_id" VARCHAR(11) PRIMARY KEY NOT NULL,
             "Video_title" TEXT NOT NULL,
-            "Upload_data" TIMESTAMP NOT NULL,
+            "Upload_date" TIMESTAMP NOT NULL,
             "Duration" VARCHAR(20) NOT NULL,
             "View_Count" INT, 
             "Like_Count" INT,
@@ -52,7 +52,7 @@ def create_table(schema):
         CREATE TABLE IF NOT EXISTS {schema}.{table} (
             "Video_id" VARCHAR(11) PRIMARY KEY NOT NULL,
             "Video_title" TEXT NOT NULL,
-            "Upload_data" TIMESTAMP NOT NULL,
+            "Upload_date" TIMESTAMP NOT NULL,
             "Duration" TIME NOT NULL,
             "Video_Type" VARCHAR(30) NOT NULL,
             "View_Count" INT, 
@@ -71,7 +71,7 @@ def get_all_video_ids(schema):
     return video_ids
 
     # we didnot use commit get_conn_cursor cur conn in this function because we are only reading data from the database, we are not making any changes to it, so we dont need to commit anything.
-    
+
 
 
 
