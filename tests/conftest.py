@@ -1,7 +1,8 @@
 import os 
 import pytest
 from unittest import mock 
-from airflow.models import Variable, Connection
+from airflow.models import Variable, Connection, DagBag
+import psycopg2
 
 @pytest.fixture
 def api_key():
@@ -57,3 +58,38 @@ allowing us to test the functionality of the code in the dags/main.py file that 
 # 3. run the tests that are defined in the test files in the tests directory, which will use these mocked variables to test the functionality of the code in the dags/main.py file.
 
 '''
+@pytest.fixture()
+def dagbag():
+    yield DagBag()
+
+@pytest.fixture()
+def airflow_variable():
+    def get_airflow_variable(whateverthefuck):
+        env_var = f"AIRFLOW_VAR_{whateverthefuck.upper()}"
+        return os.environ.get(env_var)
+
+    return get_airflow_variable
+'''
+i have no idea why this is here, it seems like a redundant fixture that is not being used anywhere in the tests.
+but we will have a script to do this.
+'''
+
+@pytest.fixture()
+def real_postgres_connection():
+    dbname = os.getenv("ELT_DATABASE_NAME")
+    user = os.getenv("ELT_DATABASE_USER")
+    password = os.getenv("ELT_DATABASE_PASSWORD")
+    host = os.getenv("ELT_DATABASE_HOST")
+    port = os.getenv("ELT_DATABASE_PORT")
+
+    conn = None 
+    try:
+        conn = psycopg2.connect(
+            dbname=dbname, user=user, password=password, host=host, port=port
+        )
+        yield conn
+    except psycopg2.Error as e:
+        pytest.fail(f"Failed to connect to the database: {e}")
+    finally:
+        if conn:
+            conn.close()
