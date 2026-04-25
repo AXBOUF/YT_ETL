@@ -1,7 +1,9 @@
 name: CI-CD PIPELINE
 on:
   push:
-    branches: [ main , feature/* ]
+    branches: 
+      - main
+      - 'feature/**'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -10,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Get changed Files
         id: changed-files-build
@@ -18,7 +20,6 @@ jobs:
         with:
           files: |
             Dockerfile
-            dockerfile
             requirements.txt
 
 
@@ -35,7 +36,7 @@ jobs:
       - name: Build and push Docker image
         if: steps.changed-files-build.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
-               docker buildx build --push -f dockerfile \
+               docker buildx build --push -f Dockerfile \
                  --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest \
                  --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:${{ github.sha }} \
                  .
