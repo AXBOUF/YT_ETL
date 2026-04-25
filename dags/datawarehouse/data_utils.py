@@ -69,7 +69,7 @@ def get_all_video_ids(cur, schema):
     ids = cur.fetchall()
     video_ids = [row['Video_id'] for row in ids]
     return video_ids
-
+#change 
     # we didnot use commit get_conn_cursor cur conn in this function because we are only reading data from the database, we are not making any changes to it, so we dont need to commit anything.
 
 

@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Get Changed Files
+      - name: Get changed Files
         id: changed-files-build
         uses: tj-actions/changed-files@v47
         with:
