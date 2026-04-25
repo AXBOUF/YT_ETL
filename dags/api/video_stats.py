@@ -39,7 +39,7 @@ def get_channel_playlist_id():
         #     json.dump(data, f, indent=4)
         return channel_playlist_id
     except requests.exceptions.RequestException as e:
-        return e
+        raise e
 @task
 def count(anything): # why because i can 
     return len(anything)
@@ -83,7 +83,7 @@ def get_video_ids(playlist_id):
         return video_ids
              
     except requests.exceptions.RequestException as e:
-        return e
+        raise e
 
 # def batch_video_ids( video_ids, batch_size=50):
 #     for i in range(0, len(video_ids), batch_size):
@@ -204,7 +204,7 @@ def extract_video_data(video_ids):
 
 
     except requests.exceptions.RequestException as e:
-        return e
+        raise e
 @task
 
 def save_to_json(extracted_data):
